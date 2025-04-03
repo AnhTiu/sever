@@ -7,7 +7,7 @@ const register = asyncHandler(async (req, res) => {
         success: false,
         message: 'Missing input'
     })
-    const response = await User.create(req.body)
+    const response = await Users.create(req.body)
     return res.status(200).json({
         success: response ? true : false,
         response
