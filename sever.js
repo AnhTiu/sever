@@ -1,14 +1,16 @@
 const express = require('express')
 require('dotenv').config()
-
+const dbConnect = require('./config/dbconnect')
+const initRouter = require('./routers')
 
 const app = express()
 const port = process.env.PORT || 8888
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-
-app.use('/', (req, res) => {res.send('SEVER ON')})
+dbConnect()
+initRouter(app)
+//app.use('/', (req, res) => {res.send('SEVER ON')})
 
 app.listen(port, () =>{
-    console.log('Server running on the port: ' + port);
+    console.log('Server is running on the port: ' + port);
 })
