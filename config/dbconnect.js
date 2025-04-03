@@ -11,6 +11,7 @@ const dbConnect = async () => {
         console.log('DB connection failed')
         throw new Error(error);
         
+        
     }
 }
 

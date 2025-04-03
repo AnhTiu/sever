@@ -7,7 +7,7 @@ const initRouter = (app) => {
 
 
     app.use(notFound)
-    app.use(errHandler)
+    app.use(errHandler) 
 }
 
 module.exports = initRouter
