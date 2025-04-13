@@ -10,7 +10,9 @@ router.get('/logout', ctrl.logout)
 router.get('/forgotpassword', ctrl.forgotPassword)  
 router.put('/resetpassword', ctrl.resetPassword) 
 router.get('/', [verifyAccessToken, isAdmin], ctrl.getUsers)   
-router.delete('/', [verifyAccessToken, isAdmin], ctrl.deleteUser)   
+router.delete('/', [verifyAccessToken, isAdmin], ctrl.deleteUser)
+router.put('/current', [verifyAccessToken], ctrl.updateUser) 
+router.put('/:uid', [verifyAccessToken, isAdmin], ctrl.updateUserByAdmin)    
 
 module.exports = router
 

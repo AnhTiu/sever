@@ -164,13 +164,34 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 })
 
-const updateUser = asyncHandler(async (req, res) => { // Đoạn này đang chưa xong
-    const {_id} = req.query
-    if(!_id) throw new Error('Missing id')
-    const response = await User.findByIdAndDelete(_id)
+const updateUser = asyncHandler(async (req, res) => { 
+    const {_id} = req.user
+    if(!_id || Object.keys(req.body).length === 0) throw new Error('Missing id or data')
+    const response = await User.findByIdAndUpdate(
+        _id,
+        req.body,
+        {new: true}
+    ).select('-password -role -refreshToken') 
+
     return res.status(200).json({
         success: response ? true : false,
-        deletedUser: response ? `User with email ${response.email} deleted` : 'Something went wrong'
+        updatedUser: response ? response : 'Something went wrong'
+    })
+
+})
+
+const updateUserByAdmin = asyncHandler(async (req, res) => { 
+    const {uid} = req.params
+    if(Object.keys(req.body).length === 0) throw new Error('Missing id or data')
+    const response = await User.findByIdAndUpdate(
+        uid,
+        req.body,
+        {new: true}
+    ).select('-password -role -refreshToken') 
+
+    return res.status(200).json({
+        success: response ? true : false,
+        updatedUser: response ? response : 'Something went wrong'
     })
 
 })
@@ -186,5 +207,6 @@ module.exports = {
     resetPassword,
     getUsers,
     deleteUser,
-    updateUser
+    updateUser,
+    updateUserByAdmin
 }
