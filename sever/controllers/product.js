@@ -44,6 +44,17 @@ const getProducts = asyncHandler (async(req, res) => {
         queryCommand = queryCommand.sort(sortBy)
     }
 
+    // field limiting 
+    if(req.query.fields){
+        const fields = req.query.fields.split(',').join(' ')
+        queryCommand = queryCommand.select(fields)
+    }
+
+    // pagination
+    const page = +req.query.page || 1
+    const limit = +req.query.limit || process.env.LIMIT_PRODUCT;
+    const skip = (page - 1) * limit;
+    queryCommand.skip(skip).limit(limit);
     // Excute query
     // So luong san pham thoa man dieu kien !== so luong san pham tra ve 1 lan goi api
     try {
@@ -79,11 +90,31 @@ const deleteProduct = asyncHandler (async(req, res) => {
         deletedProduct: deletedProduct ? deletedProduct : 'Failed to delete product',
     })
 })
-
+const rating = asyncHandler(async (req, res) => {
+    const { _id} = req.user;
+    const {star, comment, pid} = req.body;
+    if(!star || !pid)throw new Error('Some things are missing')
+    const ratingProduct = await Product.findById(pid);
+    const ratingExists = ratingProduct?.ratings?.find(el => el.postedBy.toString() === _id);
+    //console.log({ratingExists});
+    if(ratingExists){
+        await Product.updateOne({
+            ratings: {$elemMatch: ratingExists}
+        }, {
+            $set: { "ratings.$.star": star, "ratings.$.comment": comment }
+        }, {new: true})
+    }else{
+        const response = await Product.findByIdAndUpdate(pid, {$push: {ratings: {star, comment, postedBy: _id}}}, {new: true});
+    }
+    return res.status(200).json({
+        status: true
+    })
+})
 module.exports = {
     createProduct,
     getProduct,
     getProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    rating
 }
